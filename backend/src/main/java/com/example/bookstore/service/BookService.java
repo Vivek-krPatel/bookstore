@@ -18,9 +18,14 @@ import org.springframework.stereotype.Service;
  * @author ACE
  */
 @Service
-@AllArgsConstructor
 public class BookService {
     private final BookRepository bookRepository;
+
+    public BookService(BookRepository bookRepository) {
+        this.bookRepository = bookRepository;
+    }
+    
+    
     
     public List<Book> findall(){
         List<Book> books = bookRepository.findAll(); 

@@ -4,6 +4,7 @@
  */
 package com.example.bookstore.DTO;
 
+import java.time.Year;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -24,7 +25,7 @@ public class Book_DTO {
     private float rating;
     private com.example.bookstore.models.Category category;
     private String description;
-    private String created_at;
+    private Year Year_of_publication;
     private double price;
     private String image_url;
     

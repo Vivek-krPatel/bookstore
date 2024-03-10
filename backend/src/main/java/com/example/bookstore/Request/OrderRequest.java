@@ -5,7 +5,7 @@
 package com.example.bookstore.Request;
 
 import com.example.bookstore.models.Address;
-import com.example.bookstore.models.Book;
+import com.example.bookstore.models.Cart;
 import com.example.bookstore.models.UserDetails;
 
 /**
@@ -21,7 +21,7 @@ import com.example.bookstore.models.UserDetails;
 
 public class OrderRequest {
     private UserDetails user;
-    private Book book;
+    private Cart cart;
     private Address address; 
      
 }

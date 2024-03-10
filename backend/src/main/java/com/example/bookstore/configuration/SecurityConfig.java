@@ -4,52 +4,138 @@
  */
 package com.example.bookstore.configuration;
 
+
+import java.util.Arrays;
+import java.util.Collections;
 import javax.sql.DataSource;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.jdbc.datasource.DriverManagerDataSource;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.ProviderManager;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import static org.springframework.security.config.Customizer.withDefaults;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.JdbcUserDetailsManager;
 import org.springframework.security.provisioning.UserDetailsManager;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.stereotype.Component;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 /**
  *
  * @author ACE
  */
+
+
+/*
 @Component
 public class SecurityConfig {
+    @Autowired
+    private CustomAuthenticationEntryPoint entryPoint;
     
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-        .httpBasic(withDefaults()) // authentication
-        .authorizeHttpRequests((authorize) -> authorize  // authorization
-            .anyRequest().authenticated()
-        );
+        http.cors().and()
+        .httpBasic(withDefaults())// authentication
+        .authorizeHttpRequests((authorize) -> authorize
+                // authorization
+            .anyRequest().authenticated())
+            //.exceptionHandling().authenticationEntryPoint(entryPoint)
+                ;
         
-    http.csrf().disable();
+        http.csrf().disable();
+    
 
-    return http.build();
-}
-
-
+        return http.build();
+    }
+ 
+*/
+@Configuration
+public class SecurityConfig {
+ //   @Autowired
+  //  private CustomAuthenticationEntryPoint entryPoint;
     
     @Bean
-    JdbcUserDetailsManager user(DataSource source){
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+         http
+            .authorizeHttpRequests(auth-> auth
+                    //.requestMatchers("/**").permitAll());
+                    .requestMatchers("/api/books/**").permitAll()
+                    .requestMatchers("/api/users/login","/api/users/register","/api/users/logout").permitAll()
+                    .and())
+            .authorizeHttpRequests((auth) -> auth
+                    .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                    .requestMatchers("/api/users/**").hasAnyRole("USER", "ADMIN")
+                 //.anyRequest().permitAll())
+            .anyRequest().authenticated().and())
+            //.logout((logout) -> logout.logoutUrl("/api/users/logout"))
+                    //.permitAll())
+            .httpBasic(withDefaults());
+    http.cors().and()
+    .csrf().disable();
+    
+
+    return http.build();
+   }
+    
+   @Bean
+   public CorsConfigurationSource corsConfigurationSource() {
+       CorsConfiguration configuration = new CorsConfiguration();
+       
+       configuration.setAllowedOriginPatterns(Arrays.asList("*"));
+       configuration.setAllowedMethods(Arrays.asList("*"));
+       configuration.setAllowedHeaders(Arrays.asList("*"));
+       configuration.setAllowCredentials(true);
+       UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+       
+       source.registerCorsConfiguration("/**", configuration);
+       
+       return source; 
+   }
+    
+   @Bean
+   public AuthenticationManager authenticationManager(JdbcUserDetailsManager userDetailsManager, PasswordEncoder passwordEncoder) {
+       DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
+       authenticationProvider.setUserDetailsService(userDetailsManager);
+       authenticationProvider.setPasswordEncoder(passwordEncoder);
+       
+       return new ProviderManager(Collections.singletonList(authenticationProvider));
+       //return new ProviderManager(authenticationProvider);
+   }
+   
+       
+   /*
+    @Bean
+    public DataSource dataSource() {
+        DriverManagerDataSource dataSource = new DriverManagerDataSource();
+        dataSource.setDriverClassName("com.mysql.jdbc.Driver");
+        dataSource.setUrl("jdbc:mysql://localhost:3306/bookstore");
+        dataSource.setUsername("spring");
+        dataSource.setPassword("springboot");
+        return dataSource;
+    }
+   */
+  
+    
+    @Bean
+    public JdbcUserDetailsManager user(DataSource source){
+        /*
         UserDetails admin = User.builder()
                 .username("admin")
                 .password("{bcrypt}$2a$10$GRLdNijSQMUvl/au9ofL.eDwmoohzzS7.rmNSJZ.0FxO/BTk76klW")
                 .roles("USER","ADMIN")
                 .build();
-        
-        JdbcUserDetailsManager users = new JdbcUserDetailsManager(source);
-        //users.createUser(admin);
-        return users;   
+        */
+        JdbcUserDetailsManager manager = new JdbcUserDetailsManager(source);
+        //users.createUser(admin);mamager
+        return manager;   
     }
     
 

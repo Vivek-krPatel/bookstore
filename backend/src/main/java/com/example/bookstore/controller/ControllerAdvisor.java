@@ -5,7 +5,9 @@
 package com.example.bookstore.controller;
 
 import com.example.bookstore.Exception.AddressNotFoundException;
+import com.example.bookstore.Exception.BadCredentialsException;
 import com.example.bookstore.Exception.BookNotFoundException;
+import com.example.bookstore.Exception.CartNotFoundException;
 import com.example.bookstore.Exception.UserAlreadyExistsException;
 import com.example.bookstore.Exception.UserNotFoundException;
 import org.springframework.http.HttpStatus;
@@ -45,6 +47,18 @@ public class ControllerAdvisor extends ResponseEntityExceptionHandler {
     @ExceptionHandler(AddressNotFoundException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public String handleAddressNotFound(UserNotFoundException ex){
+        return ex.getMessage();
+    }
+    
+    @ExceptionHandler(BadCredentialsException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public String handleBadCredentialsException(BadCredentialsException ex){
+        return ex.getMessage();
+    }
+    
+    @ExceptionHandler(CartNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public String handleCartNotFoundException(CartNotFoundException ex){
         return ex.getMessage();
     }
     

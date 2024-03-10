@@ -11,7 +11,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.sql.Date;
-import lombok.AllArgsConstructor;
+import java.time.Year;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -50,8 +50,8 @@ public class Book {
     @Column(name="description")
     private String description;
     
-    @Column(name="created_at")
-    private Date created_at;
+    @Column(name="Year_of_publication")
+    private Year Year_of_publication;
     
     @Column(name="price",nullable = false)
     private double price;
@@ -59,13 +59,13 @@ public class Book {
     @Column(name="image_url")
     private String image_url; 
 
-    public Book(String title, String author, float rating, Category category, String description, Date created_at, double price, String image_url) {
+    public Book(String title, String author, float rating, Category category, String description, Year Year_of_publication, double price, String image_url) {
         this.title = title;
         this.author = author;
         this.rating = rating;
         this.category = category;
         this.description = description;
-        this.created_at = created_at;
+        this.Year_of_publication = Year_of_publication;
         this.price = price;
         this.image_url = image_url;
     }

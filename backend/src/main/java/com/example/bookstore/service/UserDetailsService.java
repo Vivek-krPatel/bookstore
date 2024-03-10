@@ -9,7 +9,10 @@ import com.example.bookstore.DTO.User_DTO;
 import com.example.bookstore.Exception.BookNotFoundException;
 import com.example.bookstore.Exception.UserNotFoundException;
 import com.example.bookstore.models.Book;
+import com.example.bookstore.models.Cart;
 import com.example.bookstore.models.Order;
+import com.example.bookstore.models.CartProduct;
+import com.example.bookstore.models.OrderProduct;
 import com.example.bookstore.models.UserDetails;
 import com.example.bookstore.repository.BookRepository;
 import com.example.bookstore.repository.OrderRepository;
@@ -19,6 +22,13 @@ import java.util.Optional;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import com.example.bookstore.repository.UserDetailsRepository;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.stream.Collectors;
+import com.example.bookstore.repository.CartProductRepository;
+import java.util.ArrayList;
+import java.util.Collections;
 
 /**
  *
@@ -30,6 +40,9 @@ public class UserDetailsService {
     private final UserDetailsRepository userRepository;
     private final BookRepository bookRepository;
     private final OrderRepository orderRepository;
+    private final CartService cartService;
+    private final OrderProductService orderProductService;
+    
     
     public void createUser(UserDetails user){
         this.userRepository.save(user);
@@ -66,44 +79,95 @@ public class UserDetailsService {
         }
     }
     
-    public Order_DTO createOrderForUser(Long userId, Long bookId){
+    public Order_DTO createOrderForUser(Long userId, CartProduct product){
         UserDetails user = userRepository.findById(userId).orElseThrow(() ->
         new UserNotFoundException(userId));
+       
         
-        Optional<Book> optional = bookRepository.findById(bookId);
-        if(optional.isPresent()){
-            Book book = optional.get();
+        //Optional<Book> optional = bookRepository.findById(product.getBook().getId());
+       // if(optional.isPresent()){
+         //   Book book = optional.get();
             Order order = 
                     //new Order(book,LocalDate.now(),LocalDate.now(),user,book.getPrice());
                     
                     Order.builder()
-                          .book(book)
+                          //.products(Arrays.asList(mapCartProductToOrderProduct(product))
+                          //.quantity(quantity)
                           .orderDate(LocalDate.now())
                           .user(user)
-                          .amount(book.getPrice())
+                          //.amount(product.getQuantity() * product.getBook().getPrice())
                          // .address(address)
                           .build();
-     
-
-       // order.setUser(user);
-        orderRepository.save(order);
+            
+       //Set<OrderProduct> setProducts = new HashSet<OrderProduct>();
+        //setProducts.add(mapCartProductToOrderProduct(product,order));
+        
+        //order.setProducts(Arrays.asList(orderProduct));
+        order = orderRepository.save(order);
+        
+        //orderProduct.setPrice();
+        OrderProduct orderProduct = mapCartProductToOrderProduct(product,order);
+        OrderProduct saved = this.orderProductService.saveOrderProduct(orderProduct);
+        Set<OrderProduct> products = new HashSet<>();
+        products.add(saved);
+        order.setProducts(products);
+        order.setAmount();
+        order = orderRepository.save(order);
+        
         //user.addOrder(order);
         Order_DTO orderdto = Order_DTO.builder()
                              .orderId(order.getOrderId())
-                             .book(book)
+                             .products(order.getProducts())
                              .orderDate(order.getOrderDate().toString())
+                             .status(order.getStatus())
                              .modifiedAt(order.getModifiedAt()!= null?order.getModifiedAt().toString():null)
                              .username(order.getUser().getUsername())
                              .amount(order.getAmount())
                              //.address()
                              .build();
         return orderdto;
-        }else{
-            throw new BookNotFoundException(bookId);
-        }
+       // }else{
+       //     throw new BookNotFoundException(product.getBook().getId());
+       // }
         
     }
     
+    public Order_DTO checkout(Long userId, Cart cart){
+        UserDetails user = this.userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
+        for(CartProduct product : cart.getProducts()){
+            Book book = this.bookRepository.findById(product.getBook().getId()).orElseThrow(() -> new BookNotFoundException(product.getBook().getId()));
+        }
+        
+        Order order = Order.builder()
+                    //.products(cart.getProducts())
+                    .orderDate(LocalDate.now())
+                    .user(user)
+                    .build();
+        Order blank = orderRepository.save(order);
+        
+        Set<OrderProduct> orders = cart.getProducts().stream().map(product -> mapCartProductToOrderProduct(product,blank)).collect(Collectors.toSet());
+        orders = this.orderProductService.saveAllOrderProducts(orders);
+        blank.setProducts(orders);
+        blank.setAmount();
+        
+        Order saved = this.orderRepository.save(blank);
+        this.cartService.clearCart(cart.getId());
+        
+        
+        Order_DTO orderdto = Order_DTO.builder()
+                    .orderId(saved.getOrderId())
+                             .products(saved.getProducts())
+                             .orderDate(saved.getOrderDate().toString())
+                             .status(saved.getStatus())
+                             .modifiedAt(saved.getModifiedAt()!= null?order.getModifiedAt().toString():null)
+                             .username(saved.getUser().getUsername())
+                             .amount(saved.getAmount())
+                             //.address()
+                             .build();
+        return orderdto;
+        
+        
+    }
     
     //TODO return orderdtos not order entities
     
@@ -119,6 +183,14 @@ public class UserDetailsService {
             throw new UserNotFoundException(email);
         }
         return user;
+    }
+    
+    public Cart getUserCart(UserDetails user){
+        return this.cartService.findCartByUser(user);
+    }
+    
+    public Set<CartProduct> getCartItemsForUser(Long id){
+        return this.cartService.getCartItems(id);
     }
     
     //won't work the exception will be thrown before each checks are performed
@@ -142,6 +214,17 @@ public class UserDetailsService {
         
     }
     */
+    
+    OrderProduct mapCartProductToOrderProduct(CartProduct cartProduct, Order order){
+        OrderProduct product = OrderProduct.builder()
+                            .book(cartProduct.getBook())
+                            .price(cartProduct.getPrice())
+                            .quantity(cartProduct.getQuantity())
+                            .order(order)
+                            .build();
+        return product;
+        
+    }
 
     
 }
