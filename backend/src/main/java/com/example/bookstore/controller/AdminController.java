@@ -24,18 +24,24 @@ import org.springframework.web.bind.annotation.RestController;
 
 /**
  *
- * @author ACE
+ * @author Vivek
  */
 @RestController
 @RequestMapping("/api/admin")
-@AllArgsConstructor
 @NoArgsConstructor
 @PreAuthorize("hasRole('ADMIN')")
 public class AdminController {
-    @Autowired
+    //@Autowired
     private ModelMapper mapper;
-    @Autowired
+    //@Autowired
     private BookService bookservice;
+
+    public AdminController(ModelMapper mapper, BookService bookservice) {
+        this.mapper = mapper;
+        this.bookservice = bookservice;
+    }
+    
+    
     
     //@PreAuthorize("Admin")
     @PostMapping("/books")

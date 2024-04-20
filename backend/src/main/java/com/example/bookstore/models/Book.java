@@ -6,6 +6,8 @@ package com.example.bookstore.models;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -20,7 +22,7 @@ import lombok.ToString;
 
 /**
  *
- * @author ACE
+ * @author Vivek
  */
 @Entity
 @NoArgsConstructor
@@ -44,6 +46,7 @@ public class Book {
     @Column(name="rating")
     private float rating;
     
+    @Enumerated(EnumType.STRING)
     @Column(name="category")
     private Category category;
     

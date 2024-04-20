@@ -13,6 +13,7 @@ import com.example.bookstore.Exception.CartNotFoundException;
 import com.example.bookstore.Exception.UserAlreadyExistsException;
 import com.example.bookstore.Exception.UserNotFoundException;
 import com.example.bookstore.Request.LoginRequest;
+import com.example.bookstore.Request.ProfileEditRequest;
 import com.example.bookstore.models.Address;
 import com.example.bookstore.models.Cart;
 import com.example.bookstore.models.Order;
@@ -37,6 +38,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -62,7 +64,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 /**
  *
- * @author ACE
+ * @author Vivek
  */
 @RestController
 @RequestMapping("/api/users")
@@ -124,6 +126,28 @@ public class UserDetailsController {
         }
     }
     
+    @PostMapping("/profile/edit")
+    @PostAuthorize("returnObject.owner == authentication.name")
+    public ResponseEntity<?> editProfile(Authentication auth, @RequestBody ProfileEditRequest request){
+        if(auth instanceof AnonymousAuthenticationToken){
+            return new ResponseEntity<>("Please Log in",HttpStatus.UNAUTHORIZED);
+        }
+         try{
+             String username = auth.getName();
+             UserDetails user = this.userService.findUserByUsername(username).get();
+             user.setFirstName(request.getFirstName());
+             user.setLastName(request.getLastName());
+             user.setEmail(request.getEmail());
+             user.setPhone(request.getPhone());
+             user = this.userService.createUser(user);
+             UserProfileResponse profile = mapper.map(user, UserProfileResponse.class);
+        return ResponseEntity.ok(profile);
+        } catch(UserNotFoundException ex) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,ex.getMessage());
+        }
+        
+    }
+    
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest, HttpServletRequest request, HttpServletResponse response) {
         Authentication authenticationRequest = UsernamePasswordAuthenticationToken.unauthenticated(loginRequest.getUsername(), loginRequest.getPassword());
@@ -154,21 +178,24 @@ public class UserDetailsController {
 }
         
         */
+    
+   
     private SecurityContextLogoutHandler handler = new SecurityContextLogoutHandler();
-    @PostMapping("/logout")
+    @GetMapping("/logout")
     public ResponseEntity<Void> logout(Authentication auth, HttpServletRequest request, HttpServletResponse response){
-       // HttpSession session = request.getSession(false);
-       // if(session != null){
-        //    session.invalidate();
-       // }
+        HttpSession session = request.getSession(false);
+        System.out.println(session);
+        if(session != null){
+            session.invalidate();
+       }
         this.handler.logout(request, response, auth);
         return ResponseEntity.noContent().build();
     }
-    
-
+  
+   
     
     @PostMapping("/register")
-    public ResponseEntity<Void> createUser(@RequestBody User_DTO userdto){
+    public ResponseEntity<Void> createUser(@RequestBody User_DTO userdto, HttpServletRequest request, HttpServletResponse response){
         try{
             Optional<UserDetails> existing_email = userService.findUserByEmail(userdto.getEmail());
             
@@ -178,7 +205,7 @@ public class UserDetailsController {
             
             }catch(UserNotFoundException ex){
                 
-                // I don't know what to do with this catch bock.  
+                  
             }
 
         try{
@@ -190,7 +217,7 @@ public class UserDetailsController {
 
         }catch(UserNotFoundException ex){
 
-            // I don't know what to do with this catch bock either.
+         
         }
 
         try{
@@ -203,9 +230,7 @@ public class UserDetailsController {
             this.userService.createUser(newuser);
             
         
-       // List<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>();
-       // authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
-        
+       
             String username = newuser.getUsername();
             String password = newuser.getPassword();
         
@@ -218,20 +243,39 @@ public class UserDetailsController {
         //UserDetails user = new User(username, passwordEncoder.encode(password), authorities);
         
             manager.createUser(user);
+            
+            //log in the user
+            LoginRequest login = new LoginRequest(username,password);
+            this.login(login, request, response);
+            /*
+            Authentication authenticationRequest = UsernamePasswordAuthenticationToken.unauthenticated(username, password);
+        try {
+            Authentication authenticationResponse = this.authenticationManager.authenticate(authenticationRequest);
+            SecurityContext context = this.securityContextHolderStrategy.createEmptyContext();
+            context.setAuthentication(authenticationResponse);
+            this.securityContextHolderStrategy.setContext(context);
+            this.repo.saveContext(context, request, response);
+
+            SecurityContextHolder.getContext().setAuthentication(authenticationResponse);
+            //return ResponseEntity.ok("log in successfull");
+           } catch (BadCredentialsException exc) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+           }
+            */
         }
         
             return ResponseEntity.ok().build();
        
     }
 
-    //TODO return orderdtos not order entities
+
     
     @GetMapping("/orders")
     public ResponseEntity<List<Order_DTO>> getAllOrdersForUser(Authentication auth){
         String username = auth.getName();
         List<Order> orders = userService.getAllOrdersForUser(username);
         List<Order_DTO> orderdtos = orders.stream().map(this::orderDtoMapper)
-                                   .collect(Collectors.toList());;
+                                   .collect(Collectors.toList());
         return ResponseEntity.ok(orderdtos);
     }
     

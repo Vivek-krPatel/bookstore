@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link href="./css/item.css" rel="stylesheet" >
+    <title>item</title>
+</head>
+<body>
+    <header class="header">
+		<a href="./index.html">
+        <div class="logo">
+            <img src="./images/Bookmark.png" alt="site--logo" class="main--logo"/>
+            <h1>BookHaven</h1>
+        </div>
+		</a>
+        <a href="./search.html">Search</a>
+        <a href="./books.html">Browse</a>
+        <a href="./index.html#recommended">Recommended</a>
+        <div class="search">
+            <input type="text" placeholder="search for books" id="search-input" />
+            <img src="./images/search.png" alt="search--icon" id="search--icon" />
+        </div>
+    </header>
+    <main>
+    <div class="arrow-nav">
+        <a href="index.html">Home</a>
+        <p class="arrow-seperator">></p>
+        <a href="books.html">All Books</a>
+        <p class="arrow-seperator">></p>
+        <a href="index.html#recommended">Recommended</a>
+        <p class="arrow-seperator"></p>
+    </div>
+
+    <div class="item-details">
+        <div class="container">
+		
+        </div>
+    </div>
+
+    <div class="bestsellers">
+        <h3>Shop Similar</h3>
+        <div class="container" id="shop-similar">
+            
+        </div>
+    </div>
+    </main>
+    
+    <footer>
+		<div class="footer-left">
+			<p>Stay Updated</p>
+			<h2>BookHaven - Your Online BookStore</h2>
+			<div class="footer-icons">
+				<i class='bx bxl-facebook-square'></i>
+				<i class='bx bxl-instagram-alt' ></i>
+			</div>
+		</div>
+		
+		<div class="footer-right">
+			<div class="send-email">
+				<input type="text" />
+				<button>Subscribe</button>
+			</div>
+			<div id="footer-options">
+				<a href="#">Privacy Policy</a>
+				<a href="#">Contact Us</a>
+				<a href="#">Copyright</a>
+				<a href="#">Blog</a>
+			</div>
+		</div>
+	</footer>
+	<script src="./script/item.js"></script>
+	<script src="./node_modules/axios/dist/axios.min.js"></script>
+</body>
+</html>

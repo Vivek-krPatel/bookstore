@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component;
 
 /**
  *
- * @author ACE
+ * @author Vivek
  */
 @Component
 public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint{

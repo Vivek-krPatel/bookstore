@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="./images/signup.css" />
+    <link rel="stylesheet" href="./css/signup.css" />
     <title>Sign In</title>
 </head>
 <body>
     <div class="login-wrap">
         <div class="logo">
             <div class="logo-heading">
-                <h1>Welcome to BookHub</h1>
+                <h1>Welcome to BookHaven</h1>
             </div>
             <div class="logo-image">
                 <img src="./images/bookmark.png" alt="logo" />
@@ -18,21 +18,23 @@
         </div>
 
         <div class="form">
-            <form method="post" action="/login">
+            <form id="login-form" method="post" action="">
                 <label for="firstname">Username or Email</label>
                 <br/>
-                <input type="text" placeholder="username / email" />
+                <input type="text" placeholder="username / email" id="username"/>
                 <br/>
                 <label for="lasttname">Password</label>
                 <br/>
-                <input type="text" placeholder="password" />
+                <input type="password" placeholder="password" id="password" />
                 <br/>
-				<div class="submit">
-                    <button>Sign In</button>
-                </div>
             </form>
         </div>
+	<div class="submit">
+                    <button id="button" type="submit">Sign In</button>
+                </div>
     </div>
     
+    <script src="./script/signin.js"></script>
+	<script src="./node_modules/axios/dist/axios.min.js"></script>
 </body>
 </html>

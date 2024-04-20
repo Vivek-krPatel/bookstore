@@ -14,15 +14,22 @@ import com.example.bookstore.models.Book;
 import com.example.bookstore.models.Cart;
 import com.example.bookstore.models.CartProduct;
 import com.example.bookstore.models.UserDetails;
+import com.example.bookstore.repository.BookRepository;
 import com.example.bookstore.service.BookService;
 import com.example.bookstore.service.CartService;
 import com.example.bookstore.service.CartProductService;
 import com.example.bookstore.service.UserDetailsService;
 import java.sql.Date;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.Link;
@@ -45,19 +52,19 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.RequestParam;
 
 
 
 /**
  *
- * @author ACE
+ * @author Vivek
  */
 @RestController
 @CrossOrigin()
 @RequestMapping("/api/books")
 @AllArgsConstructor
 public class BookController {
-    private final BookService service;
     private final UserDetailsService userService;
     private final CartService cartService;
     private final BookService bookService;
@@ -74,29 +81,32 @@ public class BookController {
     
     
     @GetMapping
-    public  ResponseEntity<CollectionModel<EntityModel<Book>>> all(Authentication auth){
-        List<Book> books = this.service.findall();
-        List<EntityModel<Book>> bookModels = books.stream().map( book ->
-                EntityModel.of(book,linkTo(methodOn(BookController.class).one(auth, book.getId())).withSelfRel(),
-                linkTo(methodOn(BookController.class).all(auth))
+    public  ResponseEntity<?> all(Authentication auth, @RequestParam(defaultValue = "0") int pageNo, @RequestParam(defaultValue="") String query, @RequestParam(defaultValue = "id") String sort){
+        List<Book> books = this.bookService.findall(pageNo,query,sort);
+        if(books == null){
+            return ResponseEntity.notFound().build();
+        }
+        List<EntityModel<Book_DTO>> bookModels = books.stream().map( book ->
+                EntityModel.of(mapper.map(book,Book_DTO.class),linkTo(methodOn(BookController.class).one(auth, book.getId())).withSelfRel(),
+                linkTo(methodOn(BookController.class).all(auth,0,"",""))
                         .withRel("books")))
-                .collect(Collectors.toList());
+                    .collect(Collectors.toList());
         
-        Link selfLink = linkTo(methodOn(BookController.class).all(auth)).withSelfRel();
+        Link selfLink = linkTo(methodOn(BookController.class).all(auth,0,"","")).withSelfRel();
         
-        CollectionModel<EntityModel<Book>> collectionModel = CollectionModel.of(bookModels,selfLink);
+        CollectionModel<EntityModel<Book_DTO>> collectionModel = CollectionModel.of(bookModels,selfLink);
         return ResponseEntity.ok(collectionModel);  
     }
     
     @GetMapping("/{id}")
     @ResponseBody
-    public ResponseEntity<EntityModel<Book>> one(Authentication auth, @PathVariable Long id){
+    public ResponseEntity<EntityModel<Book_DTO>> one(Authentication auth, @PathVariable Long id){
         try{
-        Book book = this.service.findone(id);
-        EntityModel<Book> bookModel = EntityModel.of(book);
+        Book book = this.bookService.findone(id);
+        EntityModel<Book_DTO> bookModel = EntityModel.of(mapper.map(book,Book_DTO.class));
         Link selfLink = linkTo(methodOn(BookController.class).one(auth, id)).withSelfRel();
         //Link orderBookLink = linkTo(methodOn(BookController.class).createOrderForUser(auth, id)).withRel("place_order");
-        Link booksLink = linkTo(methodOn(BookController.class).all(auth)).withRel("books");
+        Link booksLink = linkTo(methodOn(BookController.class).all(auth,0,"","")).withRel("books");
         
         bookModel.add(selfLink, booksLink);
         return ResponseEntity.ok(bookModel);
@@ -105,34 +115,69 @@ public class BookController {
         }
     }
     
-    
-    /*
-    @PostMapping("/books/{bookId}/add")
-    public ResponseEntity<?> addItemtoCart(Authentication auth,CartProduct item){
-        if(auth instanceof AnonymousAuthenticationToken){
-             return new ResponseEntity<>("Please Log in",HttpStatus.UNAUTHORIZED);
+    @GetMapping("/search")
+    public ResponseEntity<?> searchForBook(Authentication auth, @RequestParam(defaultValue="") String query, @RequestParam(defaultValue = "0") int pageNo){
+        List<Book> books = this.bookService.search(query, pageNo);
+        if(books == null){
+            return ResponseEntity.notFound().build();
         }
-        UserDetails user;
-        try{
-        String name = auth.getName();
-        user = userService.findUserByUsername(name).get();
-        Cart cart = this.cartService.findCartByUser(user);
-        this.cartService.additemToCart(item, cart.getId());
-        return ResponseEntity.ok(cart);
-        } catch(UserNotFoundException | CartNotFoundException ex) {
-            if(ex instanceof CartNotFoundException){
-                Cart cart = this.cartService.createCart(user);
-                this.cartService.additemToCart(item, cart.getId());
-                return ResponseEntity.ok(cart);
-            }else if(ex instanceof UserNotFoundException){   
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND,ex.getMessage());
-            }
-        }
-           
+        
+        List<EntityModel<Book_DTO>> bookModels = books.stream().map( book ->
+                EntityModel.of(mapper.map(book,Book_DTO.class),linkTo(methodOn(BookController.class).one(auth, book.getId())).withSelfRel(),
+                linkTo(methodOn(BookController.class).all(auth,pageNo,"",""))
+                        .withRel("books")))
+                    .collect(Collectors.toList());
+        
+        Link selfLink = linkTo(methodOn(BookController.class).all(auth,0,"","")).withSelfRel();
+        
+        CollectionModel<EntityModel<Book_DTO>> collectionModel = CollectionModel.of(bookModels,selfLink);
+        return ResponseEntity.ok(collectionModel);
     }
     
-    */
+    @GetMapping("/category")
+    public ResponseEntity<?> searchForcategory(Authentication auth, @RequestParam(defaultValue="") Set<String> query, @RequestParam(defaultValue = "0") int pageNo, @RequestParam(defaultValue = "id") String sort){
+        List<Book> books = this.bookService.searchCategory(query, pageNo,sort);
+        if(books == null){
+            return ResponseEntity.notFound().build();
+        }
+        
+        List<EntityModel<Book_DTO>> bookModels = books.stream().map( book ->
+                EntityModel.of(mapper.map(book,Book_DTO.class),linkTo(methodOn(BookController.class).one(auth, book.getId())).withSelfRel(),
+                linkTo(methodOn(BookController.class).all(auth,pageNo,"",""))
+                        .withRel("books")))
+                    .collect(Collectors.toList());
+        
+        Link selfLink = linkTo(methodOn(BookController.class).all(auth,0,"","")).withSelfRel();
+        
+        CollectionModel<EntityModel<Book_DTO>> collectionModel = CollectionModel.of(bookModels,selfLink);
+        return ResponseEntity.ok(collectionModel);
+    }
     
+    
+    
+    @GetMapping("/filter")
+    public ResponseEntity<?> getProducts(Authentication auth,@RequestParam(value="category",required=false) Set<String> category,@RequestParam(defaultValue = "asc",required=false) String sort, @RequestParam(defaultValue = "0") int pageNo){
+        List<Book> books = this.bookService.filterAndSortBooksByCategory(category, sort,pageNo);
+        if(books == null){
+            return ResponseEntity.notFound().build();
+        }
+        
+        //List<Book> books = this.bookService.filterAndSortBooksByCategory(category, sort,pageNo);
+        List<EntityModel<Book_DTO>> bookModels = books.stream().map( book ->
+                EntityModel.of(mapper.map(book,Book_DTO.class),linkTo(methodOn(BookController.class).one(auth, book.getId())).withSelfRel(),
+                linkTo(methodOn(BookController.class).all(auth,pageNo,"",""))
+                        .withRel("books")))
+                    .collect(Collectors.toList());
+        
+        Link selfLink = linkTo(methodOn(BookController.class).all(auth,0,"","")).withSelfRel();
+        
+        CollectionModel<EntityModel<Book_DTO>> collectionModel = CollectionModel.of(bookModels,selfLink);
+        return ResponseEntity.ok(collectionModel);
+    }
+        
+
+    
+    @PreAuthorize("hasRole('USER')")
     @PostMapping("/{bookId}/add")
     public ResponseEntity<?> addItemToCart(Authentication auth, @RequestBody ProductRequest request) {
         //UserDetails user;
@@ -150,32 +195,14 @@ public class BookController {
                 return ResponseEntity.ok(product);
             }
         } catch (UserNotFoundException ex) {
-           // ex.printStackTrace();
             throw new ResponseStatusException(HttpStatus.NOT_FOUND,ex.getMessage());
             //return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
         }
-        //return ResponseEntity.badRequest().build();
     }
     
-    //@PreAuthorize("hasRole('USER')")
-                                    
-                                
-        //Order_DTO orderdto = userService.createOrderForUser(id, bookId);
-      
-       // String orderUrl = uriComponentsBuilder.path("/users/"+userId+"/orders/"+orderdto.getOrderId())
-                     //       .toUriString();
-      //  OrderResponse orderResponse = new OrderResponse(orderdto,orderUrl); 
-      // HttpHeaders headers = new HttpHeaders();
-      //  headers.setLocation(URI.create(orderUrl));  
     
     
-    /*
-     * create a seperate method that checks whether requested item already exits in the users cart,
-     * if so then return a exception , product already exists in the cart , and then adjust he quantity accordingly
-     * calling another method controlled by user actions , then place order.
-     * Also duplicate key error was because i wasn't checking whether the produc already exists in the users cart.
-    */
-    
+    @PreAuthorize("hasRole('USER')")
     @PostMapping("/{bookid}/buy")
     public ResponseEntity<?> buyBook(Authentication auth,@RequestBody ProductRequest request){
         if(auth instanceof AnonymousAuthenticationToken){
@@ -190,29 +217,13 @@ public class BookController {
                 try{
                     Cart cart = this.cartService.findCartByUser(user);
                     CartProduct product = this.cartService.addItemToCart(request, cart.getId());
-                    /*
-                    CartProduct product = CartProduct.builder()
-                                        .book(book)
-                                        .cart(cart)
-                                        .quantity(request.getQuantity())
-                                        .build();
-                    product.setPrice();
-                    CartProduct saved = this.productService.saveProduct(product);
-                    */
+                   
                     Order_DTO orderDTO = this.userService.createOrderForUser(user.getId(), product);
                     return ResponseEntity.ok(orderDTO);
                     }catch (CartNotFoundException ex){
                         Cart cart = this.cartService.createCart(user);
                         CartProduct product = this.cartService.addItemToCart(request,cart.getId());
-                        /*
-                        CartProduct product = CartProduct.builder()
-                                        .book(book)
-                                        .cart(cart)
-                                        .quantity(request.getQuantity())
-                                        .build();
-                        product.setPrice();
-                        CartProduct saved = this.productService.saveProduct(product);
-                        */
+                        
                         Order_DTO orderDTO = this.userService.createOrderForUser(user.getId(), product);
                         return ResponseEntity.ok(orderDTO);
             }
@@ -227,10 +238,7 @@ public class BookController {
         }
         
     }
-    /* Admin routes
-    * Need refactoring 
-    */
-  
+   
     
     
    // private final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");

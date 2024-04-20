@@ -7,7 +7,10 @@ body {
     box-sizing: border-box;
     font-family:600 16px/18px Poppins, sans-serif;
 	color:#6a6f8c;
-	background: whitesmoke;
+	/*background: whitesmoke; */
+    background-image: url(./jose.jpg);
+    background-size: cover;
+    background-position-y: bottom;
 	/*
 	background: rgb(234,233,241);
 	background: radial-gradient(circle, rgba(234,233,241,1) 0%, rgba(167,195,223,1) 35%, rgba(53,62,73,1) 100%);

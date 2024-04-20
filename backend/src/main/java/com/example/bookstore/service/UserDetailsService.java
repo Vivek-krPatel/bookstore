@@ -32,7 +32,7 @@ import java.util.Collections;
 
 /**
  *
- * @author ACE
+ * @author Vivek
  */
 @Service
 @AllArgsConstructor
@@ -44,8 +44,8 @@ public class UserDetailsService {
     private final OrderProductService orderProductService;
     
     
-    public void createUser(UserDetails user){
-        this.userRepository.save(user);
+    public UserDetails createUser(UserDetails user){
+        return this.userRepository.save(user);
     }
     
     public UserDetails findUserById(Long id){

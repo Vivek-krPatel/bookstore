@@ -8,29 +8,28 @@ package com.example.bookstore.configuration;
 import java.util.Arrays;
 import java.util.Collections;
 import javax.sql.DataSource;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import static org.springframework.security.config.Customizer.withDefaults;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.JdbcUserDetailsManager;
-import org.springframework.security.provisioning.UserDetailsManager;
-import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.stereotype.Component;
+import org.springframework.security.web.authentication.logout.HeaderWriterLogoutHandler;
+import org.springframework.security.web.header.writers.ClearSiteDataHeaderWriter;
+import static org.springframework.security.web.header.writers.ClearSiteDataHeaderWriter.Directive.COOKIES;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 /**
  *
- * @author ACE
+ * @author Vivek
  */
 
 
@@ -48,8 +47,7 @@ public class SecurityConfig {
                 // authorization
             .anyRequest().authenticated())
             //.exceptionHandling().authenticationEntryPoint(entryPoint)
-                ;
-        
+                
         http.csrf().disable();
     
 
@@ -59,12 +57,13 @@ public class SecurityConfig {
 */
 @Configuration
 public class SecurityConfig {
- //   @Autowired
-  //  private CustomAuthenticationEntryPoint entryPoint;
+    @Autowired
+    private CustomAuthenticationEntryPoint entryPoint;
     
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
          http
+            //.httpBasic(withDefaults())
             .authorizeHttpRequests(auth-> auth
                     //.requestMatchers("/**").permitAll());
                     .requestMatchers("/api/books/**").permitAll()
@@ -73,11 +72,9 @@ public class SecurityConfig {
             .authorizeHttpRequests((auth) -> auth
                     .requestMatchers("/api/admin/**").hasRole("ADMIN")
                     .requestMatchers("/api/users/**").hasAnyRole("USER", "ADMIN")
-                 //.anyRequest().permitAll())
             .anyRequest().authenticated().and())
-            //.logout((logout) -> logout.logoutUrl("/api/users/logout"))
-                    //.permitAll())
-            .httpBasic(withDefaults());
+            .exceptionHandling().authenticationEntryPoint(entryPoint);
+            //.logout((logout) -> logout.addLogoutHandler(new HeaderWriterLogoutHandler(new ClearSiteDataHeaderWriter(COOKIES))));
     http.cors().and()
     .csrf().disable();
     
@@ -126,15 +123,8 @@ public class SecurityConfig {
     
     @Bean
     public JdbcUserDetailsManager user(DataSource source){
-        /*
-        UserDetails admin = User.builder()
-                .username("admin")
-                .password("{bcrypt}$2a$10$GRLdNijSQMUvl/au9ofL.eDwmoohzzS7.rmNSJZ.0FxO/BTk76klW")
-                .roles("USER","ADMIN")
-                .build();
-        */
+       
         JdbcUserDetailsManager manager = new JdbcUserDetailsManager(source);
-        //users.createUser(admin);mamager
         return manager;   
     }
     

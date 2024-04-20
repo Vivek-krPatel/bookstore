@@ -10,7 +10,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 /**
  *
- * @author ACE
+ * @author Vivek
  */
 public interface AddressRepository extends JpaRepository<Address,Long> {
     

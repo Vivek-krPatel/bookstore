@@ -11,7 +11,7 @@ import org.springframework.stereotype.Repository;
 
 /**
  *
- * @author ACE
+ * @author Vivek
  */
 @Repository
 public interface UserDetailsRepository extends JpaRepository<UserDetails,Long>{

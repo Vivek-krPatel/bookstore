@@ -1,223 +1,77 @@
-<!Doctype html>
-<html>
-	<head>
-	<link rel="preconnect" href="https://fonts.googleapis.com">
-	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-	<link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
-	<link rel="stylesheet" href="./style.css" />
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="./css/index.css" rel="stylesheet" />
 	<link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
-	</head>
-	
-	<body>
-		<header class="header">
-			<div class="logo">
-				<img src="./images/Bookmark.png" alt="site--logo" class="main--logo"/>
-				<h1>BookHub</h1>
+    <title>Document</title>
+</head>
+<body>
+    <header class="header">
+		<a href="#">
+        <div class="logo">
+            <img src="./images/Bookmark.png" alt="site--logo" class="main--logo"/>
+            <h1>BookHaven</h1>
+        </div>
+		</a>
+        <a class="nav-links" href="./search.html">Search</a>
+        <a class="nav-links" href="./books.html">Browse</a>
+        <a class="nav-links" href="#recommended">Recommended</a>
+        <div class="user-links">
+            <a id="signin" href="./signin.html">Sign In</a>
+            <a id="signup" href="signup.html">Sign Up</a>
+        </div>
+		<button id="menu" style="display:none"><i class='bx bx-menu' style="font-size:24px"></i></button>
+		<div id="user" style="display:none">
+				<ul class="actions">
+					<li id="close"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24"><path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z"/></svg></li>
+					<li><a href="./profile.html">Profile</a></li>
+					<li><a href="./profile.html#mycart">MyCart</a></li>
+					<li><a href="#">MyOrders</a></li>
+					<li id="logout"><a href="#">Logout</a></li>
+				</ul>
 			</div>
-			<a href="#">Search</a>
-			<a href="#">Browse</a>
-			<a href="#">Recommended</a>
-			<div class="search">
-				<input type="text" placeholder="search for books" />
-				<img src="./images/search.png" alt="search--icon" class="search--icon" />
-			</div>
-		</header>
-		
-		<div class="hero--image">
-			<img src="./images/hero-image.jpg" alt="hero--img" />
-		</div>
-		
-		<div class="genre-buttons">
-				<button>Fiction</button>
-				<button>Non-Fiction</button>
-				<button>Biography</button>
-				<button>Educational</button>
-		</div>
-				
-		<div class="main-content">
-				
-					<div class="filter-dropdown">
-						<p><span style="color:#030303ff">Filter</span></p>
-							<select name="genre" id="genre" class="dropdown">
-								<option value="Fiction">Fiction</option>
-								<option value="Romance">Romance</option>
-								<option value="Educational">Educational</option>
-								<option value="Adventure">Adventure</option>
-							</select>
-							<select name="rating" id="rating" class="dropdown">
-								<option value="5.0">5.0</option>
-								<option value="4.5">4.5</option>
-								<option value="4.0">4.0</option>
-								<option value="Highest Rated">Highest Rated</option>
-							</select>
-							<select name="price" id="price" class="dropdown">
-								<option value="above 60$">above 60$</option>
-								<option value="above 50">above 50$</option>
-								<option value="above 40">above 40$</option>
-								<option value="below 40">below 40$</option>
-							</select>
-							<div class="english">
-								<input type="checkbox" id="english" nmae="english" />
-								<label for="english">English</label>
-							</div>
-							<div class="spanish">
-								<input type="checkbox" id="spanish" nmae="spanish" />
-								<label for="spanish">Spanish</label>
-							</div>
-					</div>
-					
-					<div class="container">
-						<div class="book-list">
-							<div class="book">
-								<div class="book-image">
-									<img src="./images/book-covers/1.jpg" alt="title" />
-								</div>
-								<div class="info">
-									<h3>Intro to Python</h3>
-									<p><span>Price</span></p>
-								</div>
-							</div>
-							<div class="book">
-								<div class="book-image">
-									<img src="./images/book-covers/2.jpg" alt="title" />
-								</div>
-								<div class="info">
-									<h3>Intro to Python</h3>
-									<p><span>Price</span></p>
-								</div>
-							</div>
-							<div class="book">
-								<div class="book-image">
-									<img src="./images/book-covers/6.jpg" alt="title" />
-								</div>
-								<div class="info">
-									<h3>Intro to Python</h3>
-									<p><span>Price</span></p>
-								</div>
-							</div>
-							<div class="book">
-								<div class="book-image">
-									<img src="./images/book-covers/4.jpg" alt="title" />
-								</div>
-								<div class="info">
-									<h3>Intro to Python</h3>
-									<p><span>Price</span></p>
-								</div>
-							</div>
-							<div class="book">
-								<div class="book-image">
-									<img src="./images/book-covers/5.jpg" alt="title" />
-								</div>
-								<div class="info">
-									<h3>Intro to Python</h3>
-									<p><span>Price</span></p>
-								</div>
-							</div>
-							<div class="book">
-								<div class="book-image">
-									<img src="./images/book-covers/6.jpg" alt="title" />
-								</div>
-								<div class="info">
-									<h3>Intro to Python</h3>
-									<p><span>Price</span></p>
-								</div>
-							</div>
-							<div class="book">
-								<div class="book-image">
-									<img src="./images/book-covers/7.jpg" alt="title" />
-								</div>
-								<div class="info">
-									<h3>Intro to Python</h3>
-									<p><span>Price</span></p>
-								</div>
-							</div>
-							<div class="book">
-								<div class="book-image">
-									<img src="./images/book-covers/8.jpg" alt="title" />
-								</div>
-								<div class="info">
-									<h3>Intro to Python</h3>
-									<p><span>Price</span></p>
-								</div>
-							</div>
-							<div class="book">
-								<div class="book-image">
-									<img src="./images/book-covers/9.jpg" alt="title" />
-								</div>
-								<div class="info">
-									<h3>Intro to Python</h3>
-									<p><span>Price</span></p>
-								</div>
-							</div>
-							<div class="book">
-								<div class="book-image">
-									<img src="./images/book-covers/10.jpg" alt="title" />
-								</div>
-								<div class="info">
-									<h3>Intro to Python</h3>
-									<p><span>Price</span></p>
-								</div>
-							</div>
-							<div class="book">
-								<div class="book-image">
-									<img src="./images/book-covers/11.jpg" alt="title" />
-								</div>
-								<div class="info">
-									<h3>Intro to Python</h3>
-									<p><span>Price</span></p>
-								</div>
-							</div>
-							<div class="book">
-								<div class="book-image">
-									<img src="./images/book-covers/12.jpg" alt="title" />
-								</div>
-								<div class="info">
-									<h3>Intro to Python</h3>
-									<p><span>Price</span></p>
-								</div>
-							</div>
-							<div class="book">
-								<div class="book-image">
-									<img src="./images/book-covers/13.jpg" alt="title" />
-								</div>
-								<div class="info">
-									<h3>Intro to Python</h3>
-									<p><span>Price</span></p>
-								</div>
-							</div>
-							<div class="book">
-								<div class="book-image">
-									<img src="./images/book-covers/14.jpg" alt="title" />
-								</div>
-								<div class="info">
-									<h3>Intro to Python</h3>
-									<p><span>Price</span></p>
-								</div>
-							</div>
-							<div class="book">
-								<div class="book-image">
-									<img src="./images/book-covers/15.jpg" alt="title" />
-								</div>
-								<div class="info">
-									<h3>Intro to Python</h3>
-									<p><span>Price</span></p>
-								</div>
-							</div>
-						</div>
+    </header>
+    
 
-						<div class="view-more">
-							<button>
-								View-more
-							</button>
-						</div>
-					</div>
-		</div>
-	
-		
-	<footer>
+    <main>
+
+        <div class="hero-section">
+            <h2>Welcome to BookHaven</h2>
+            <p>As you read a book word by word and page by page, you participate in its creation, just as a cellist playing a Bach suite participates, note by note, in the creation, the coming-to-be, the existence, of the music. And, as you read and re-read, the book of course participates in the creation of you, your thoughts and feelings, the size and temper of your soul.</p>
+
+        </div>
+
+        <div class="categories">
+            <a>Fiction</a>
+            <a>Science</a>
+            <a>Romance</a>
+            <a>Education</a>
+            <a>Science_Fiction</a>
+        </div>
+
+        <div class="bestsellers">
+            <h3>Best Sellers</h3>
+            <div class="container" id="bestsellers">
+                
+            </div>
+        </div>
+
+        
+
+        <div class="bestsellers">
+            <h3>Recommended</h3>
+            <div class="container" id="recommended">
+                
+            </div>
+        </div>
+    </main>
+    
+    <footer>
 		<div class="footer-left">
 			<p>Stay Updated</p>
-			<h2>BookHub - Your Online BookStore</h2>
+			<h2>BookHaven - Your Online BookStore</h2>
 			<div class="footer-icons">
 				<i class='bx bxl-facebook-square'></i>
 				<i class='bx bxl-instagram-alt' ></i>
@@ -237,5 +91,7 @@
 			</div>
 		</div>
 	</footer>
-	</body>
+	<script src="./script/script.js"></script>
+	<script src="./node_modules/axios/dist/axios.min.js"></script>
+</body>
 </html>

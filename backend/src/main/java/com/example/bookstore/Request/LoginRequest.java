@@ -9,7 +9,7 @@ import lombok.Data;
 
 /**
  *
- * @author ACE
+ * @author Vivek
  */
 @AllArgsConstructor
 @Data
@@ -17,14 +17,4 @@ public class LoginRequest {
     private String username;
     private String password;
     
-    // getters and setters
 }
-
-/*
-public class LoginResponse {
-    private String token;
-    
-    // constructors, getters and setters
-}
-
-*/
