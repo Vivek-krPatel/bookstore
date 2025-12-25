@@ -50,11 +50,8 @@ Steps:
 - PUT /api/books/{id} - update a book
 - DELETE /api/books/{id} - delete a book
 
-(Adjust according to your actual controller mappings.)
 
 ## Screenshots
-
-Below are portrait-oriented placeholder screenshots that were added to the images/ folder. The original landscape screenshots were rotated to portrait orientation and saved as SVG placeholders here.
 
 ![Screenshot 1](images/screenshot 1.svg)
 
@@ -64,12 +61,3 @@ Below are portrait-oriented placeholder screenshots that were added to the image
 
 ![Screenshot 6](images/screenshot 6.svg)
 
-## Notes on images
-
-- Filenames intentionally include spaces as requested: "screenshot 1", "screenshot 2", "screenshot 5", "screenshot 6".
-- The images are portrait-oriented SVG placeholders (600x900) so they appear vertically rather than horizontally.
-- If you provide the original screenshots, I can rotate and replace these SVG placeholders with the corrected images (JPEG/PNG).
-
-## License
-
-This project is provided under the MIT License. See LICENSE for details.
