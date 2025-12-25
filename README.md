@@ -53,11 +53,11 @@ Steps:
 
 ## Screenshots
 
-![Screenshot 1](images/screenshot 1.svg)
+![Screenshot 1](images/screenshot 1.jpeg)
 
-![Screenshot 2](images/screenshot 2.svg)
+![Screenshot 2](images/screenshot 2.jpeg)
 
-![Screenshot 5](images/screenshot 5.svg)
+![Screenshot 5](images/screenshot 5.jpeg)
 
-![Screenshot 6](images/screenshot 6.svg)
+![Screenshot 6](images/screenshot 6.jpeg)
 
